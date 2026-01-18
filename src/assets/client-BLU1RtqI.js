@@ -2299,7 +2299,15 @@ class Vt {
     ...n
   } = {}) {
     (Bt.add(this), Jt.set(this, void 0));
-    const r = { apiKey: t, authToken: s, ...n, baseURL: e || 'https://api.anthropic.com' };
+    const r = {
+      apiKey: t,
+      authToken: s,
+      ...n,
+      baseURL:
+        e ||
+        (typeof window !== 'undefined' && window.CLAUDE_CONFIG?.apiEndpoint) ||
+        'https://api.anthropic.com',
+    };
     if (
       !r.dangerouslyAllowBrowser &&
       'undefined' != typeof window &&

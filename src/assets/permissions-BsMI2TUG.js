@@ -813,6 +813,12 @@ const L = (e) =>
   },
   F = async () => {
     try {
+      // Claude (Patched): Check if API mode is enabled
+      const _apiSettings = await N(['useCustomApi', 'customApiKey']);
+      if (_apiSettings.useCustomApi && _apiSettings.customApiKey) {
+        return { isValid: !0, isRefreshed: !1, isApiMode: !0 };
+      }
+
       const e = await N([I.ACCESS_TOKEN, I.REFRESH_TOKEN, I.TOKEN_EXPIRY]);
       if (!e[I.ACCESS_TOKEN]) return { isValid: !1, isRefreshed: !1 };
       const t = Date.now(),
