@@ -1,6 +1,6 @@
 # Claude (Patched)
 
-A modified version of the official Claude Chrome Extension that supports custom API endpoints.
+A modified version of the official Claude Chrome Extension that supports custom API endpoints and API-only mode (no login required).
 
 ## Versioning & Naming Conventions
 
@@ -12,8 +12,9 @@ This allows both the official and patched extensions to be installed simultaneou
 ## Features
 
 - All features of the official Claude Chrome extension
+- **API Mode** - Use your own API key without requiring a Claude account login
 - **Custom API endpoint support** - Route API calls to your own server or proxy
-- Easy configuration via `config.js`
+- Settings UI in the Options page (no code editing required)
 - Tracks upstream official releases for easy updates
 
 ## Installation
@@ -24,35 +25,47 @@ This allows both the official and patched extensions to be installed simultaneou
    cd claude-chrome-extension
    ```
 
-2. Configure your custom endpoint (optional):
-   - Edit `src/config.js`
-   - Set your custom API endpoint URL
-
-3. Load the extension in Chrome:
+2. Load the extension in Chrome:
    - Open `chrome://extensions`
    - Enable "Developer mode" (toggle in top right)
    - Click "Load unpacked"
    - Select the `src/` directory
 
+3. Configure API settings:
+   - Right-click the extension icon → "Options" (or click the gear icon in the sidepanel)
+   - Enable "Use Custom API" toggle
+   - Enter your API Base URL (e.g., `https://api.anthropic.com`)
+   - Enter your API Key
+   - Click "Save Settings"
+
 ## Configuration
 
-Edit `src/config.js` to customize your settings:
+### Using the Settings UI
 
-```javascript
-window.CLAUDE_CONFIG = {
-  // Your custom API endpoint (leave empty for default Anthropic API)
-  apiEndpoint: "https://your-custom-api.example.com",
+1. Open the extension Options page
+2. Under "API Settings", enable the "Use Custom API" toggle
+3. Enter your settings:
+   - **API Base URL**: Your API endpoint (e.g., `https://api.anthropic.com`)
+   - **API Key**: Your Anthropic API key (starts with `sk-ant-`)
+4. Click "Save Settings"
 
-  // Custom WebSocket endpoint (optional, auto-derived from apiEndpoint if empty)
-  wsEndpoint: "",
-};
-```
+When API Mode is enabled:
+- No OAuth login is required
+- The extension uses your API key directly
+- All requests go to your specified endpoint
 
-After changing the configuration, reload the extension in `chrome://extensions`.
+### Account Mode vs API Mode
+
+| Feature | Account Mode | API Mode |
+|---------|-------------|----------|
+| Login required | Yes (OAuth) | No |
+| Uses Claude account | Yes | No |
+| API Key needed | No | Yes |
+| Custom endpoint | No | Yes |
 
 ## Branches
 
-- **`main`** - Custom version with API endpoint modifications
+- **`main`** - Custom version with API mode and endpoint modifications
 - **`upstream`** - Pristine official extension source (for tracking updates)
 
 ## Updating to New Official Versions
@@ -82,25 +95,42 @@ git tag vX.X.XX.1
 
 This extension modifies the official Claude Chrome extension to:
 
-1. Load a `config.js` file before other scripts
-2. Check for `window.CLAUDE_CONFIG.apiEndpoint` when making API calls
-3. Use the custom endpoint if configured, otherwise fall back to the default Anthropic API
-4. Update the Content Security Policy to allow connections to custom endpoints
+1. Add a settings UI for API configuration (Options page)
+2. Store settings in `chrome.storage.local` (isolated keys to avoid conflicts)
+3. Load settings before modules via `api-bootstrap.js`
+4. Bypass OAuth when API mode is enabled
+5. Use custom endpoint and API key for all requests
+6. Update the Content Security Policy to allow connections to custom endpoints
 
 ### Files Modified from Official Extension
 
 - `manifest.json` - Updated CSP, name, version; removed `key` (allows coexistence with official extension)
-- `sidepanel.html` - Loads config.js
-- `options.html` - Loads config.js
-- `newtab.html` - Loads config.js
-- `assets/client-BLU1RtqI.js` - Checks for custom baseURL
-- `assets/permissions-BsMI2TUG.js` - Checks for custom API/WS URLs
-- `config.js` - New file for user configuration
+- `sidepanel.html` - Loads api-bootstrap.js
+- `options.html` - Loads api-settings.js
+- `newtab.html` - Loads api-bootstrap.js
+- `assets/client-BLU1RtqI.js` - Checks for custom baseURL from `window.CLAUDE_CONFIG`
+- `assets/permissions-BsMI2TUG.js` - Bypasses OAuth when API mode enabled
+- `assets/sidepanel-yURUk1gX.js` - Uses custom API key from `window.CLAUDE_CONFIG`
+
+### New Files
+
+- `api-settings.js` - Settings UI for the Options page
+- `api-bootstrap.js` - Loads settings from storage before modules initialize
+
+### Storage Keys
+
+The extension uses its own isolated storage keys to avoid conflicts:
+
+| Key | Type | Purpose |
+|-----|------|---------|
+| `useCustomApi` | boolean | Toggle for API mode |
+| `customApiBaseUrl` | string | Custom API endpoint URL |
+| `customApiKey` | string | User's API key |
 
 ## Requirements
 
 - Google Chrome browser
-- (Optional) Your own API endpoint compatible with the Anthropic API format
+- For API Mode: An Anthropic API key or compatible endpoint
 
 ## Disclaimer
 

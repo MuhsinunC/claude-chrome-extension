@@ -58344,7 +58344,10 @@ function RV() {
         l = de.useCallback(async () => {
           r(!0);
           const e = await Ee(),
-            n = (await fe(me.ANTHROPIC_API_KEY)) || void 0;
+            n =
+              (typeof window !== 'undefined' && window.CLAUDE_CONFIG?.apiKey) ||
+              (await fe(me.ANTHROPIC_API_KEY)) ||
+              void 0;
           (t(void 0 === e && !0), i(e), a(n), r(!1));
         }, []),
         c = de.useCallback(async () => {
