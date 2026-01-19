@@ -1000,7 +1000,7 @@ function R() {
                                   children: [
                                     c.jsx('div', {
                                       className: 'font-large text-text-100',
-                                      children: 'Use Custom API',
+                                      children: 'Use API',
                                     }),
                                     c.jsx('div', {
                                       className: 'text-text-400 font-base-sm mt-1',
