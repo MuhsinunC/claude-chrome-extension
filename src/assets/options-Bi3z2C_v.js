@@ -788,18 +788,22 @@ function R() {
     [C, E] = d.useState(!1),
     [R, T] = d.useState(),
     // Claude (Patched): Track custom API mode
-    [_hasCustomApi, _setHasCustomApi] = d.useState(!1);
+    [_hasCustomApi, _setHasCustomApi] = d.useState(!1),
+    [_apiBaseUrl, _setApiBaseUrl] = d.useState('https://api.anthropic.com'),
+    [_apiKey, _setApiKey] = d.useState(''),
+    [_apiMessage, _setApiMessage] = d.useState({ text: '', type: '' }),
+    [_showApiKey, _setShowApiKey] = d.useState(!1);
   (d.useEffect(() => {
     h([x.ANTHROPIC_API_KEY, x.SYSTEM_PROMPT, x.DEBUG_MODE]).then((e) => {
       (e[x.ANTHROPIC_API_KEY] && m(e[x.ANTHROPIC_API_KEY]),
         e[x.SYSTEM_PROMPT] && v(e[x.SYSTEM_PROMPT]),
         void 0 !== e[x.DEBUG_MODE] ? k(e[x.DEBUG_MODE]) : k(!1));
     });
-    // Claude (Patched): Check for custom API mode
-    h(['useCustomApi', 'customApiKey']).then((e) => {
-      if (e.useCustomApi && e.customApiKey) {
-        _setHasCustomApi(!0);
-      }
+    // Claude (Patched): Load custom API settings
+    h(['useCustomApi', 'customApiBaseUrl', 'customApiKey']).then((e) => {
+      if (e.useCustomApi) _setHasCustomApi(!0);
+      if (e.customApiBaseUrl) _setApiBaseUrl(e.customApiBaseUrl);
+      if (e.customApiKey) _setApiKey(e.customApiKey);
     });
   }, [!1]),
     d.useEffect(() => {
@@ -940,7 +944,15 @@ function R() {
                               children: c.jsx(t, { defaultMessage: 'Shortcuts', id: '7FAwwkYilD' }),
                             }),
                           }),
-                          o,
+                          /* Claude (Patched): API Settings tab */
+                          c.jsx('li', {
+                            children: c.jsx(P, {
+                              href: '/settings/api',
+                              isActive: 'api' === p,
+                              onClick: () => F('api'),
+                              children: 'API Settings',
+                            }),
+                          }),
                         ],
                       }),
                       s &&
@@ -970,7 +982,123 @@ function R() {
                   }),
                   c.jsxs('div', {
                     children: [
-                      'api' === p && o,
+                      /* Claude (Patched): API Settings content */
+                      'api' === p && c.jsx('div', {
+                        className: 'bg-bg-100 border border-border-300 rounded-xl px-6 pt-6 pb-6 md:px-8 md:pt-8 md:pb-8',
+                        children: c.jsxs('div', {
+                          children: [
+                            c.jsxs('div', {
+                              className: 'flex justify-between items-start mb-2',
+                              children: [
+                                c.jsx('h3', { className: 'text-text-100 font-xl-bold', children: 'Custom API' }),
+                                c.jsx('button', {
+                                  onClick: () => {
+                                    const newVal = !_hasCustomApi;
+                                    _setHasCustomApi(newVal);
+                                    if (!newVal) {
+                                      chrome.storage.local.set({ useCustomApi: !1 });
+                                    }
+                                  },
+                                  className: n(
+                                    'relative w-11 h-6 rounded-full transition-colors',
+                                    _hasCustomApi ? 'bg-accent-main-100' : 'bg-bg-300'
+                                  ),
+                                  children: c.jsx('div', {
+                                    className: n(
+                                      'absolute top-0.5 w-5 h-5 bg-oncolor-100 rounded-full shadow transition-transform',
+                                      _hasCustomApi ? 'translate-x-[22px]' : 'translate-x-0.5'
+                                    ),
+                                  }),
+                                }),
+                              ],
+                            }),
+                            c.jsx('p', {
+                              className: 'text-text-300 font-base mt-2 mb-6',
+                              children: 'Use your own API endpoint and key instead of your Claude account. This allows using Claude without a Pro subscription.',
+                            }),
+                            _hasCustomApi && c.jsxs('div', {
+                              className: 'space-y-4 pt-4 border-t border-border-300',
+                              children: [
+                                c.jsxs('div', {
+                                  children: [
+                                    c.jsx('label', {
+                                      className: 'block text-text-200 font-base-sm mb-2',
+                                      children: 'API Base URL',
+                                    }),
+                                    c.jsx('input', {
+                                      type: 'url',
+                                      value: _apiBaseUrl,
+                                      onChange: (e) => _setApiBaseUrl(e.target.value),
+                                      placeholder: 'https://api.anthropic.com',
+                                      className: 'w-full px-3 py-2.5 bg-bg-000 border border-border-300 rounded-lg text-text-100 font-base placeholder:text-text-400 focus:outline-none focus:border-accent-main-100',
+                                    }),
+                                  ],
+                                }),
+                                c.jsxs('div', {
+                                  children: [
+                                    c.jsx('label', {
+                                      className: 'block text-text-200 font-base-sm mb-2',
+                                      children: 'API Key',
+                                    }),
+                                    c.jsxs('div', {
+                                      className: 'relative',
+                                      children: [
+                                        c.jsx('input', {
+                                          type: _showApiKey ? 'text' : 'password',
+                                          value: _apiKey,
+                                          onChange: (e) => _setApiKey(e.target.value),
+                                          placeholder: 'sk-ant-...',
+                                          className: 'w-full px-3 py-2.5 pr-16 bg-bg-000 border border-border-300 rounded-lg text-text-100 font-base placeholder:text-text-400 focus:outline-none focus:border-accent-main-100',
+                                        }),
+                                        c.jsx('button', {
+                                          type: 'button',
+                                          onClick: () => _setShowApiKey(!_showApiKey),
+                                          className: 'absolute right-3 top-1/2 -translate-y-1/2 text-text-300 hover:text-text-200 font-base-sm',
+                                          children: _showApiKey ? 'Hide' : 'Show',
+                                        }),
+                                      ],
+                                    }),
+                                  ],
+                                }),
+                                c.jsx('button', {
+                                  onClick: async () => {
+                                    if (!_apiBaseUrl.trim()) {
+                                      _setApiMessage({ text: 'Please enter an API Base URL', type: 'error' });
+                                      return;
+                                    }
+                                    if (!_apiKey.trim()) {
+                                      _setApiMessage({ text: 'Please enter an API Key', type: 'error' });
+                                      return;
+                                    }
+                                    try {
+                                      new URL(_apiBaseUrl);
+                                    } catch {
+                                      _setApiMessage({ text: 'Please enter a valid URL', type: 'error' });
+                                      return;
+                                    }
+                                    await chrome.storage.local.set({
+                                      useCustomApi: !0,
+                                      customApiBaseUrl: _apiBaseUrl.trim(),
+                                      customApiKey: _apiKey.trim(),
+                                    });
+                                    _setApiMessage({ text: 'Settings saved! Reload the extension to apply.', type: 'success' });
+                                    setTimeout(() => _setApiMessage({ text: '', type: '' }), 3000);
+                                  },
+                                  className: 'px-6 py-2.5 bg-accent-main-100 text-oncolor-100 rounded-lg hover:bg-accent-main-100/90 transition-all font-base',
+                                  children: 'Save Settings',
+                                }),
+                                _apiMessage.text && c.jsx('div', {
+                                  className: n(
+                                    'px-4 py-3 rounded-lg font-base',
+                                    _apiMessage.type === 'success' ? 'bg-success-100/10 text-success-100' : 'bg-danger-000/10 text-danger-000'
+                                  ),
+                                  children: _apiMessage.text,
+                                }),
+                              ],
+                            }),
+                          ],
+                        }),
+                      }),
                       'model' === p && o,
                       'permissions' === p && c.jsx(S, {}),
                       'prompts' === p && c.jsx(N, {}),
