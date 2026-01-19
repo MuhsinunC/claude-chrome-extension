@@ -45133,7 +45133,8 @@ const ij = () =>
   sj = n.createContext(null);
 let uj = null,
   lj = null;
-const cj = ({ children: e }) => (T() ? r.jsx(r.Fragment, { children: e }) : r.jsx(ij, {})),
+/* Claude (Patched): Always show children, no auth gate */
+const cj = ({ children: e }) => r.jsx(r.Fragment, { children: e }),
   fj = ({ children: e, pageName: t }) => {
     const { analytics: o } = n.use(
         (lj ||
@@ -45192,16 +45193,12 @@ const cj = ({ children: e }) => (T() ? r.jsx(r.Fragment, { children: e }) : r.js
         } catch (e) {}
       }, [o]),
       l = n.useMemo(() => ({ analytics: o, resetAnalytics: u }), [o, u]);
+    /* Claude (Patched): Always show settings content, allow API key configuration without login */
     return s
       ? r.jsx(ij, {})
-      : a
-        ? r.jsx(sj.Provider, {
+      : r.jsx(sj.Provider, {
             value: l,
             children: r.jsx(_, { children: r.jsx(cj, { children: e }) }),
-          })
-        : r.jsx('div', {
-            className: 'bg-bg-100 flex h-screen items-center justify-center',
-            children: r.jsx(aj, {}),
           });
   },
   dj = ({ children: e, pageName: t }) =>
