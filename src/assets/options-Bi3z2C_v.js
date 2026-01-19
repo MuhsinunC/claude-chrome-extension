@@ -810,7 +810,8 @@ function R() {
       const e = () => {
           const e = window.location.hash.slice(1),
             [s, t] = e.split('?'),
-            a = ['api', 'permissions', 'model', 'prompts', 'testdata'].includes(s)
+            /* Claude (Patched): Add 'advanced' tab for API settings */
+            a = ['api', 'permissions', 'model', 'prompts', 'testdata', 'advanced'].includes(s)
               ? s
               : 'permissions';
           let n,

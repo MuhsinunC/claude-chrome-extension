@@ -45143,6 +45143,15 @@ const ij = () =>
           className: 'mt-5',
           children: r.jsx($n, { defaultMessage: 'Log in', id: 'odXlk858Gb' }),
         }),
+        /* Claude (Patched): Add API Key button to bypass login */
+        r.jsx(TT, {
+          onClick: () => {
+            chrome.tabs.create({ url: chrome.runtime.getURL('options.html#advanced') });
+          },
+          variant: 'secondary',
+          className: 'mt-3',
+          children: 'Use API Key',
+        }),
       ],
     });
   },
