@@ -786,12 +786,20 @@ function R() {
     [j, v] = d.useState(''),
     [w, k] = d.useState(!1),
     [C, E] = d.useState(!1),
-    [R, T] = d.useState();
+    [R, T] = d.useState(),
+    // Claude (Patched): Track custom API mode
+    [_hasCustomApi, _setHasCustomApi] = d.useState(!1);
   (d.useEffect(() => {
     h([x.ANTHROPIC_API_KEY, x.SYSTEM_PROMPT, x.DEBUG_MODE]).then((e) => {
       (e[x.ANTHROPIC_API_KEY] && m(e[x.ANTHROPIC_API_KEY]),
         e[x.SYSTEM_PROMPT] && v(e[x.SYSTEM_PROMPT]),
         void 0 !== e[x.DEBUG_MODE] ? k(e[x.DEBUG_MODE]) : k(!1));
+    });
+    // Claude (Patched): Check for custom API mode
+    h(['useCustomApi', 'customApiKey']).then((e) => {
+      if (e.useCustomApi && e.customApiKey) {
+        _setHasCustomApi(!0);
+      }
     });
   }, [!1]),
     d.useEffect(() => {
@@ -834,7 +842,7 @@ function R() {
       c.jsxs(L, {
         large: !0,
         mdTitle:
-          s || l
+          true /* Claude (Patched): Always show settings, no login required */
             ? c.jsx('div', {
                 className: 'flex flex-col pl-3',
                 children: c.jsx('span', {
@@ -899,7 +907,7 @@ function R() {
               children: c.jsx(t, { defaultMessage: 'Settings', id: 'D3idYvSLF9' }),
             }),
           }),
-          s || l
+          true /* Claude (Patched): Always show settings, no login required */
             ? c.jsxs('div', {
                 className:
                   'grid md:grid-cols-[220px_minmax(0px,_1fr)] gap-x-8 w-full max-w-6xl my-4 md:my-8',
