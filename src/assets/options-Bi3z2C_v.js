@@ -907,8 +907,8 @@ function R() {
               children: c.jsx(t, { defaultMessage: 'Settings', id: 'D3idYvSLF9' }),
             }),
           }),
-          true /* Claude (Patched): Always show settings, no login required */
-            ? c.jsxs('div', {
+          /* Claude (Patched): Always show settings, no login required */
+          c.jsxs('div', {
                 className:
                   'grid md:grid-cols-[220px_minmax(0px,_1fr)] gap-x-8 w-full max-w-6xl my-4 md:my-8',
                 children: [
@@ -978,10 +978,6 @@ function R() {
                     ],
                   }),
                 ],
-              })
-            : c.jsx('div', {
-                className: 'flex flex-col items-center justify-center min-h-[400px]',
-                children: c.jsx(i, {}),
               }),
         ],
       }),
