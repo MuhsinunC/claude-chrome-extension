@@ -944,13 +944,13 @@ function R() {
                               children: c.jsx(t, { defaultMessage: 'Shortcuts', id: '7FAwwkYilD' }),
                             }),
                           }),
-                          /* Claude (Patched): API Settings tab */
+                          /* Claude (Patched): Advanced Settings tab */
                           c.jsx('li', {
                             children: c.jsx(P, {
                               href: '/settings/api',
                               isActive: 'api' === p,
                               onClick: () => F('api'),
-                              children: 'API Settings',
+                              children: 'Advanced',
                             }),
                           }),
                         ],
@@ -987,10 +987,10 @@ function R() {
                         className: 'bg-bg-100 border border-border-300 rounded-xl px-6 pt-6 pb-6 md:px-8 md:pt-8 md:pb-8',
                         children: c.jsxs('div', {
                           children: [
-                            c.jsx('h3', { className: 'text-text-100 font-xl-bold', children: 'Custom API' }),
+                            c.jsx('h3', { className: 'text-text-100 font-xl-bold', children: 'API Settings' }),
                             c.jsx('p', {
                               className: 'text-text-300 font-base mt-2 mb-6',
-                              children: 'Use your own API endpoint and key instead of your Claude account. This allows using Claude without a Pro subscription.',
+                              children: 'Use your own API endpoint and key instead of your Claude account. When enabled, this overrides account-based authentication.',
                             }),
                             c.jsxs('div', {
                               className: 'flex items-center justify-between py-4',
@@ -1000,13 +1000,13 @@ function R() {
                                   children: [
                                     c.jsx('div', {
                                       className: 'font-large text-text-100',
-                                      children: 'Enable Custom API',
+                                      children: 'Use Custom API',
                                     }),
                                     c.jsx('div', {
                                       className: 'text-text-400 font-base-sm mt-1',
                                       children: _hasCustomApi
-                                        ? 'Custom API mode is active'
-                                        : 'Use your own API key instead of Claude account',
+                                        ? 'API key mode active (overrides account)'
+                                        : 'When enabled, uses your API key instead of account',
                                     }),
                                   ],
                                 }),
