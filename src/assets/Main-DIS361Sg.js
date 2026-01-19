@@ -44950,12 +44950,21 @@ const XN = (e = !0) =>
         e < 3,
     }),
   YN = n.createContext(null),
+  /* Claude (Patched): Modified to support API mode authentication */
   QN = ({ children: e }) => {
     const [t, o] = n.useState(!1),
-      [i, a] = n.useState(!0);
+      [i, a] = n.useState(!0),
+      [apiModeAuth, setApiModeAuth] = n.useState(!1);
     n.useEffect(() => {
       (async () => {
         try {
+          /* Claude (Patched): Check for API mode first */
+          const apiSettings = await chrome.storage.local.get(['useCustomApi', 'customApiKey']);
+          if (apiSettings.useCustomApi && apiSettings.customApiKey) {
+            setApiModeAuth(!0);
+            a(!1);
+            return;
+          }
           const e = await y(b.ACCESS_TOKEN);
           o(!!e);
         } catch (e) {
@@ -44965,6 +44974,12 @@ const XN = (e = !0) =>
         }
       })();
       const e = (e) => {
+        /* Claude (Patched): Listen for API mode changes */
+        if ('useCustomApi' in e || 'customApiKey' in e) {
+          chrome.storage.local.get(['useCustomApi', 'customApiKey']).then((s) => {
+            setApiModeAuth(s.useCustomApi && !!s.customApiKey);
+          });
+        }
         if (b.ACCESS_TOKEN in e) {
           const t = e[b.ACCESS_TOKEN].newValue;
           o(!!t);
@@ -44978,7 +44993,8 @@ const XN = (e = !0) =>
       );
     }, []);
     const { data: s, isLoading: u, error: l } = XN(t),
-      c = { userProfile: s ?? null, isLoading: i || (t && u), error: l, isAuthenticated: t && !!s };
+      /* Claude (Patched): API mode is considered authenticated */
+      c = { userProfile: s ?? null, isLoading: i || (t && u), error: l, isAuthenticated: apiModeAuth || (t && !!s) };
     return r.jsx(YN.Provider, { value: c, children: e });
   },
   ZN = () => {
