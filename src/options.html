@@ -8,31 +8,21 @@
     <script>
       // Set initial theme mode based on system preference
       (function () {
-        const isDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
-        ).matches;
-        document.documentElement.setAttribute(
-          "data-mode",
-          isDark ? "dark" : "light",
-        );
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-mode', isDark ? 'dark' : 'light');
         // Listen for system theme changes
-        window
-          .matchMedia("(prefers-color-scheme: dark)")
-          .addEventListener("change", (e) => {
-            document.documentElement.setAttribute(
-              "data-mode",
-              e.matches ? "dark" : "light",
-            );
-          });
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          document.documentElement.setAttribute('data-mode', e.matches ? 'dark' : 'light');
+        });
       })();
     </script>
     <script type="module" crossorigin src="/assets/options-Bi3z2C_v.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/permissions-BsMI2TUG.js">
-    <link rel="modulepreload" crossorigin href="/assets/Main-DIS361Sg.js">
-    <link rel="modulepreload" crossorigin href="/assets/SentryService-Bpayo6Ny.js">
-    <link rel="modulepreload" crossorigin href="/assets/datadog-BkLmkJ5p.js">
-    <link rel="modulepreload" crossorigin href="/assets/TasksTab-Bu17Fa0S.js">
-    <link rel="stylesheet" crossorigin href="/assets/Main-BWmGWfNh.css">
+    <link rel="modulepreload" crossorigin href="/assets/permissions-BsMI2TUG.js" />
+    <link rel="modulepreload" crossorigin href="/assets/Main-DIS361Sg.js" />
+    <link rel="modulepreload" crossorigin href="/assets/SentryService-Bpayo6Ny.js" />
+    <link rel="modulepreload" crossorigin href="/assets/datadog-BkLmkJ5p.js" />
+    <link rel="modulepreload" crossorigin href="/assets/TasksTab-Bu17Fa0S.js" />
+    <link rel="stylesheet" crossorigin href="/assets/Main-BWmGWfNh.css" />
   </head>
   <body>
     <div id="root"></div>

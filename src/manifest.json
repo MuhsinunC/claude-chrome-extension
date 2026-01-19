@@ -1,5 +1,5 @@
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
+  "update_url": "https://clients2.google.com/service/update2/crx",
 
   "manifest_version": 3,
   "name": "Claude",
@@ -34,46 +34,28 @@
     "unlimitedStorage",
     "downloads"
   ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
-      "js": [
-        "assets/content-script.ts-Bwa5rY9t.js"
-      ],
-      "matches": [
-        "https://claude.ai/*",
-        "https://*.claude.ai/*"
-      ],
+      "js": ["assets/content-script.ts-Bwa5rY9t.js"],
+      "matches": ["https://claude.ai/*", "https://*.claude.ai/*"],
       "run_at": "document_end"
     },
     {
-      "js": [
-        "assets/accessibility-tree.js-D8KNCIWO.js"
-      ],
-      "matches": [
-        "<all_urls>"
-      ],
+      "js": ["assets/accessibility-tree.js-D8KNCIWO.js"],
+      "matches": ["<all_urls>"],
       "run_at": "document_start",
       "all_frames": true
     },
     {
-      "js": [
-        "assets/agent-visual-indicator.js-Ct7LqXhp.js"
-      ],
-      "matches": [
-        "<all_urls>"
-      ],
+      "js": ["assets/agent-visual-indicator.js-Ct7LqXhp.js"],
+      "matches": ["<all_urls>"],
       "run_at": "document_idle",
       "all_frames": false
     }
   ],
   "externally_connectable": {
-    "matches": [
-      "https://claude.ai/*",
-      "https://*.claude.ai/*"
-    ]
+    "matches": ["https://claude.ai/*", "https://*.claude.ai/*"]
   },
   "commands": {
     "toggle-side-panel": {
@@ -90,19 +72,12 @@
   },
   "web_accessible_resources": [
     {
-      "matches": [
-        "https://*.claude.ai/*",
-        "https://claude.ai/*"
-      ],
-      "resources": [
-        "assets/content-script.ts-Bwa5rY9t.js"
-      ],
+      "matches": ["https://*.claude.ai/*", "https://claude.ai/*"],
+      "resources": ["assets/content-script.ts-Bwa5rY9t.js"],
       "use_dynamic_url": false
     },
     {
-      "matches": [
-        "<all_urls>"
-      ],
+      "matches": ["<all_urls>"],
       "resources": [
         "assets/accessibility-tree.js-D8KNCIWO.js",
         "assets/agent-visual-indicator.js-Ct7LqXhp.js"

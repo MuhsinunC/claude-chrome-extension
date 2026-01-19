@@ -75,12 +75,22 @@ if [ -f "$SRC_DIR/manifest.json" ]; then
     echo "========================================="
     echo "Extracted Claude extension v${VERSION}"
     echo "========================================="
-    echo ""
-    echo "Files extracted to: $SRC_DIR"
-    echo "Next steps:"
-    echo "  git add src/"
-    echo "  git commit -m 'Sync official extension v${VERSION}'"
 else
     echo "Warning: manifest.json not found"
-    echo "Files extracted to: $SRC_DIR"
 fi
+
+# Unminify source files
+echo ""
+echo "Unminifying source files..."
+if [ -f "$SCRIPT_DIR/unminify.sh" ]; then
+    "$SCRIPT_DIR/unminify.sh"
+else
+    echo "Warning: unminify.sh not found, skipping unminification"
+fi
+
+echo ""
+echo "Files extracted to: $SRC_DIR"
+echo ""
+echo "Next steps:"
+echo "  git add src/"
+echo "  git commit -m 'Sync official extension v${VERSION}'"
