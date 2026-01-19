@@ -987,34 +987,50 @@ function R() {
                         className: 'bg-bg-100 border border-border-300 rounded-xl px-6 pt-6 pb-6 md:px-8 md:pt-8 md:pb-8',
                         children: c.jsxs('div', {
                           children: [
-                            c.jsxs('div', {
-                              className: 'flex justify-between items-start mb-2',
-                              children: [
-                                c.jsx('h3', { className: 'text-text-100 font-xl-bold', children: 'Custom API' }),
-                                c.jsx('button', {
-                                  onClick: () => {
-                                    const newVal = !_hasCustomApi;
-                                    _setHasCustomApi(newVal);
-                                    if (!newVal) {
-                                      chrome.storage.local.set({ useCustomApi: !1 });
-                                    }
-                                  },
-                                  className: n(
-                                    'relative w-11 h-6 rounded-full transition-colors',
-                                    _hasCustomApi ? 'bg-accent-main-100' : 'bg-bg-300'
-                                  ),
-                                  children: c.jsx('div', {
-                                    className: n(
-                                      'absolute top-0.5 w-5 h-5 bg-oncolor-100 rounded-full shadow transition-transform',
-                                      _hasCustomApi ? 'translate-x-[22px]' : 'translate-x-0.5'
-                                    ),
-                                  }),
-                                }),
-                              ],
-                            }),
+                            c.jsx('h3', { className: 'text-text-100 font-xl-bold', children: 'Custom API' }),
                             c.jsx('p', {
                               className: 'text-text-300 font-base mt-2 mb-6',
                               children: 'Use your own API endpoint and key instead of your Claude account. This allows using Claude without a Pro subscription.',
+                            }),
+                            c.jsxs('div', {
+                              className: 'flex items-center justify-between py-4',
+                              children: [
+                                c.jsxs('div', {
+                                  className: 'flex-1',
+                                  children: [
+                                    c.jsx('div', {
+                                      className: 'font-large text-text-100',
+                                      children: 'Enable Custom API',
+                                    }),
+                                    c.jsx('div', {
+                                      className: 'text-text-400 font-base-sm mt-1',
+                                      children: _hasCustomApi
+                                        ? 'Custom API mode is active'
+                                        : 'Use your own API key instead of Claude account',
+                                    }),
+                                  ],
+                                }),
+                                c.jsxs('label', {
+                                  className: 'relative inline-flex items-center cursor-pointer ml-4',
+                                  children: [
+                                    c.jsx('input', {
+                                      type: 'checkbox',
+                                      className: 'sr-only peer',
+                                      checked: _hasCustomApi,
+                                      onChange: (e) => {
+                                        const newVal = e.target.checked;
+                                        _setHasCustomApi(newVal);
+                                        if (!newVal) {
+                                          chrome.storage.local.set({ useCustomApi: !1 });
+                                        }
+                                      },
+                                    }),
+                                    c.jsx('div', {
+                                      className: "w-11 h-6 bg-bg-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent-secondary-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-secondary-100",
+                                    }),
+                                  ],
+                                }),
+                              ],
                             }),
                             _hasCustomApi && c.jsxs('div', {
                               className: 'space-y-4 pt-4 border-t border-border-300',
