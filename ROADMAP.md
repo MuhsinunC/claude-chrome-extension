@@ -1,0 +1,61 @@
+# ROADMAP
+
+<!--
+SCHEMA — this file is ONE nested checklist. Do not add prose sections.
+Status glyphs:  [ ] todo   [~] in progress   [x] done
+Top-level bullets are milestones; indent 2 spaces per sub-task level (sub-tasks may nest further).
+Capture every new user ask here, in the right place and order, BEFORE acting on it.
+Completed items stay (checked) as a permanent record. Keep it terse: one line per task.
+This is the single durable source of truth for all work.
+-->
+
+- [x] Project setup & durable task tracking
+  - [x] Investigate repo state (main = hand-made patches, upstream = Humanify deobfuscation, shared base v1.0.40)
+  - [x] Study cocodem/claude-for-chrome method (runtime fetch/XHR override + hosted backend; zips in repo root; 0 releases)
+  - [x] Decide architecture: injection-only patcher; archive branch; zip releases on 6h cron; global capture-first roadmap rule
+  - [x] Create ROADMAP.md as the single durable task record
+  - [x] Add global capture-first ROADMAP rule to ~/.claude/CLAUDE.md
+  - [x] Review global ROADMAP rule with claude-md-improver (zero major complaints)
+- [x] Design & plan (must be review-clean before building)
+  - [x] Map login-gate / auth flow from deobfuscated source (storage keys, profile/account endpoints, response shapes, token format)
+  - [x] Write design doc at docs/plans/2026-05-31-autonomous-patcher-design.md
+  - [x] Review plan with pr-review-toolkit:code-reviewer; iterate to zero Critical/Important (rev2: 0 Critical, Importants resolved)
+- [ ] Repo restructure
+  - [ ] Create archive/reverse-engineering branch preserving all Humanify + old hand-patch work; push
+  - [ ] Repurpose upstream branch as a pristine official-source mirror (auto-synced by CI)
+  - [ ] Slim main to the patcher project (heavy deobfuscated files out of working tree; kept in archive)
+- [ ] Injection-only patcher
+  - [ ] Injected override payload
+    - [ ] Reroute api.anthropic.com model calls -> custom base URL + inject API key header
+    - [ ] Return synthetic /api/oauth/profile 200 response to pass the login gate (only load-bearing fake; no bundle edits)
+    - [ ] Seed a synthetic local token in chrome.storage so the initial auth check passes
+    - [ ] Discard pure-ingest telemetry only (segment / sentry / datadog / honeycomb; NOT statsig/featureassets - config-bearing)
+  - [ ] Options settings UI page (toggle useCustomApi, set customApiBaseUrl, set customApiKey)
+  - [ ] Patch script (operates on an extracted official src dir)
+    - [ ] Strip _metadata/ (CRX signature)
+    - [ ] Edit manifest.json: name "Claude (Patched)", version +".1", remove key (own ID; --keep-key flag), remove update_url, broaden connect-src CSP
+    - [ ] Inject payload <script> into every module-booting HTML (enumerate *.html; v1.0.74 = options/pairing/sidepanel) before first module script
+    - [ ] Copy payload + options files into the output
+  - [ ] Refactor extract-crx.sh: output-dir arg (drop in-place rm -rf src/), remove auto-unminify call, bump Chrome UA (131 -> 140)
+  - [ ] Build/package script -> dist/claude-patched-vX.Y.Z.1.zip
+- [ ] Local verification
+  - [ ] Run refactored extract-crx.sh to fetch the current official version into a scratch dir
+  - [ ] Patch + load unpacked in Chrome; confirm it loads with no console errors
+  - [ ] Stand up a mock Anthropic-Messages endpoint; confirm reroute + key header + login bypass + response render
+  - [ ] Report what is verified vs. what needs a real Anthropic key
+- [ ] CI/CD release pipeline (GitHub Actions)
+  - [ ] Version-detect script: read latest Web Store version, compare to latest GitHub Release
+  - [ ] Workflow: cron every 6h + manual dispatch
+    - [ ] On new version: patch -> zip -> create Release tagged vX.Y.Z.1 with install notes
+    - [ ] Commit fresh official src to upstream branch
+    - [ ] On patch failure: open a GitHub issue and skip (never ship broken)
+  - [ ] Live-test via workflow_dispatch; confirm a Release is produced
+- [ ] Docs & finalize
+  - [ ] Rewrite README for new scope (autonomous patcher, releases, install, disclaimer)
+  - [ ] Create project-level CLAUDE.md (project context + pointer to ROADMAP.md) + improver pass
+  - [ ] Final code-review gate to zero Critical/Important
+  - [ ] Commit + push under MuhsinunC on correct branches
+  - [ ] Final verification + summary
+- [ ] Backlog / later (optional)
+  - [ ] Optional: purge large deobfuscated blob from main history (git filter-repo) to shrink clones
+  - [ ] Optional: keep reverse-engineering / learning notes derived from the deobfuscated source
