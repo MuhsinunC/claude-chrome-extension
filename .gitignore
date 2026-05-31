@@ -10,6 +10,10 @@ node_modules/
 dist/
 build/
 
+# Local e2e Chrome test artifacts (profile may hold a real API key; ext is a rebuildable copy)
+.chrome-test-profile/
+.chrome-test-ext/
+
 # OS files
 .DS_Store
 Thumbs.db

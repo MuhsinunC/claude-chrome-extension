@@ -1,0 +1,14 @@
+{
+  "name": "claude-chrome-extension",
+  "private": true,
+  "type": "module",
+  "description": "Autonomous patcher for Claude in Chrome",
+  "scripts": {
+    "test": "node test/override.test.mjs",
+    "test:unit": "node test/override.test.mjs",
+    "test:e2e": "node test/e2e.test.mjs"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.43.1"
+  }
+}

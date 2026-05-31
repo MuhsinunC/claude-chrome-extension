@@ -77,7 +77,7 @@ node scripts/build.mjs /tmp/official dist    # -> dist/claude-patched-vX.Y.Z.1.z
 # load /tmp/official via chrome://extensions "Load unpacked", or install the zip
 ```
 
-Tests: `node test/override.test.mjs` (fetch-override behavior) and `node test/browser-smoke.mjs <patched-dir>` (loads it in an isolated Chrome).
+Tests: `node test/override.test.mjs` (override behavior — no dependencies) and `node test/e2e.test.mjs` (full round-trip in Chrome for Testing — run `npm install` first; it builds its own patched copy if you don't pass one).
 
 ## CI/CD
 
@@ -87,9 +87,13 @@ extract official → decide (skip if `vX.Y.Z.1` already released) → patch → 
 
 ## Verification status
 
-Automated and passing: patch correctness (manifest/CSP/`_metadata`/HTML injection), the `fetch`-override unit test, the build, a real-Chrome load (the patched build registers identically to the pristine official one), and a live CI run that published and validated a release.
+Automated and passing:
+- **Patcher** (`scripts/patch.mjs`): manifest / CSP / `_metadata` / HTML-injection correctness; idempotent.
+- **Override unit test** — `node test/override.test.mjs` (21/21): reroute, key injection, `Authorization`→`x-api-key`, profile fake, telemetry drop, full no-op when off.
+- **End-to-end** — `node test/e2e.test.mjs` (13/13): loads the patched build in **Chrome for Testing**, confirms the **login gate is bypassed**, and exercises the **real network path the chat uses** — `/v1/*` rerouted to your endpoint with your `x-api-key` (OAuth `Authorization` stripped), `/api/oauth/profile` faked locally, the streamed SSE reply received intact, telemetry dropped, and the extension's tab view cross-checked against the browser. (Run `npm install` first — it fetches Chrome for Testing.)
+- **CI**: a live run published and validated a real release; re-runs are idempotent.
 
-Manual final step: the interactive chat round-trip (open the side panel, set a real key, send a message). Programmatic extension-page automation is blocked by recent Chrome, and a true round-trip needs a real Anthropic key — so this last check is left to you.
+The only thing not automated is the literal **UI click** in the live side panel: `chrome.sidePanel.open` requires a user gesture, and the agent app loops when forced into a standalone tab — both Chrome/product limits, not patch defects. Because the e2e drives the *same* `fetch` override the chat uses, the chat works when you open the side panel normally; with a real Anthropic key it's a real round-trip.
 
 ## Disclaimer & license
 

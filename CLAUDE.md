@@ -16,8 +16,8 @@ Never edit the app's minified bundles — they re-minify and re-hash every relea
 bash scripts/extract-crx.sh <out-dir>     # download pristine official extension
 node scripts/patch.mjs <ext-dir>          # apply patch in place (--keep-key optional)
 node scripts/build.mjs <ext-dir> <dist>   # -> dist/claude-patched-vX.Y.Z.1.zip
-node test/override.test.mjs               # fetch-override unit test (must stay green)
-node test/browser-smoke.mjs <ext-dir>     # load in isolated Chrome (best-effort)
+node test/override.test.mjs               # override unit test (no deps; must stay green)
+node test/e2e.test.mjs                     # full round-trip in Chrome for Testing (run `npm install` first)
 ```
 
 ## Branches

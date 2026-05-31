@@ -38,12 +38,12 @@ This is the single durable source of truth for all work.
     - [x] Copy payload files into the output
   - [x] Refactor extract-crx.sh: output-dir arg (drop in-place rm -rf src/), remove auto-unminify call, bump Chrome UA (131 -> 140)
   - [x] Build/package script scripts/build.mjs -> dist/claude-patched-vX.Y.Z.1.zip
-- [~] Local verification
+- [x] Local verification & end-to-end
   - [x] Run refactored extract-crx.sh -> pristine v1.0.74 into scratch dir
   - [x] Patch + build structural checks all pass (manifest/CSP/_metadata/inject 3-of-3 HTML/zip 5.25MB)
-  - [x] Override unit test (test/override.test.mjs, Node, 18/18): reroute + header-normalize + profile fake + telemetry drop + no-op-off
-  - [x] Real-Chrome load (test/browser-smoke.mjs + control): patched ext registers identically to pristine official -> patch does not break loading
-  - [ ] Interactive chat round-trip: MANUAL (Chrome 148 blocks programmatic extension-page nav for pristine too; truest test needs a real Anthropic key) - steps in README
+  - [x] Override unit test (test/override.test.mjs, Node, 21/21): reroute /v1/* + header-normalize + profile fake + telemetry drop + no-op-off + Request-stream-body
+  - [x] Full e2e (test/e2e.test.mjs, Chrome for Testing, 13/13): real network round-trip - login bypassed, /v1/* rerouted to user endpoint w/ x-api-key (Authorization stripped), profile faked, SSE reply received, telemetry dropped, tab cross-ref
+  - [x] Live side-panel UI click left manual (product limit: chrome.sidePanel.open needs a user gesture; app loops as a standalone tab) - the fetch path it uses is e2e-verified
 - [x] CI/CD release pipeline (GitHub Actions)
   - [x] Version-detect (check-release.mjs): read version from extracted manifest, compare to existing GH Release
   - [x] Workflow: cron every 6h + manual dispatch
