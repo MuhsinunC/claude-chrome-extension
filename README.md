@@ -83,7 +83,9 @@ Tests: `node test/override.test.mjs` (override behavior — no dependencies) and
 
 [`.github/workflows/patch-release.yml`](.github/workflows/patch-release.yml) runs on a 6-hour cron + manual dispatch:
 
-extract official → decide (skip if `vX.Y.Z.1` already released) → patch → build → create the Release → sync `upstream`. If patching ever fails (e.g. the official extension changes shape), it opens a tracking issue instead of shipping a broken build. Re-running on an already-released version is a no-op.
+extract official → decide (skip if `vX.Y.Z.1` already released) → patch → build → **e2e gate (Chrome for Testing under `xvfb` — must pass)** → publish the Release → sync `upstream`. If patching or the e2e ever fails, it opens a tracking issue instead of shipping. Re-running on an already-released version is a no-op.
+
+This pipeline is **pure GitHub Actions** (plain Node/bash scripts): it uses no Claude Code, no Claude API, and no subscription — it maintains itself at zero cost on GitHub's free tier. You just pull the latest already-tested release.
 
 ## Verification status
 
