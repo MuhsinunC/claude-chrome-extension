@@ -1,0 +1,118 @@
+name: Patch & Release
+
+# Autonomously patch every new official "Claude in Chrome" release and publish
+# the patched build to GitHub Releases. Runs on a schedule + manual dispatch.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Build/release even if the version already has a release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # create releases + push the pristine mirror to `upstream`
+  issues: write # open an issue if patching fails
+
+concurrency:
+  group: patch-release
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (main = patcher project)
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Ensure zip is available
+        run: zip --version >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y zip)
+
+      - name: Extract official extension (pristine)
+        run: bash scripts/extract-crx.sh "$RUNNER_TEMP/official"
+
+      - name: Decide whether to build
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE: ${{ inputs.force }}
+        run: node scripts/check-release.mjs "$RUNNER_TEMP/official"
+
+      - name: Apply injection-only patch
+        if: steps.decide.outputs.should_build == 'true'
+        run: node scripts/patch.mjs "$RUNNER_TEMP/official"
+
+      - name: Build release zip
+        if: steps.decide.outputs.should_build == 'true'
+        run: node scripts/build.mjs "$RUNNER_TEMP/official" "$RUNNER_TEMP/dist"
+
+      - name: Create GitHub Release
+        if: steps.decide.outputs.should_build == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.decide.outputs.tag }}
+          OFFICIAL: ${{ steps.decide.outputs.official_version }}
+        run: |
+          set -euo pipefail
+          ZIP="$RUNNER_TEMP/dist/claude-patched-${TAG}.zip"
+          test -f "$ZIP" || { echo "zip not found: $ZIP"; exit 1; }
+          printf '%s\n' \
+            "Patched build of the official **Claude in Chrome** extension, based on official **v${OFFICIAL}**." \
+            "" \
+            "### Install (unpacked)" \
+            "1. Download \`claude-patched-${TAG}.zip\` below and unzip it." \
+            "2. Open \`chrome://extensions\` and enable **Developer mode**." \
+            "3. Click **Load unpacked** and select the unzipped folder." \
+            "4. Open the extension **Options** (or click **Use API Key** on the login screen), enable API mode, enter your Anthropic API key (and optional custom base URL), and Save." \
+            "" \
+            "Unofficial; for educational/personal use. Source extension © Anthropic. See the repository README and disclaimer." \
+            > "$RUNNER_TEMP/notes.md"
+          gh release create "$TAG" "$ZIP" \
+            --title "Claude (Patched) ${TAG}" \
+            --notes-file "$RUNNER_TEMP/notes.md"
+
+      - name: Sync pristine source to upstream branch
+        if: steps.decide.outputs.should_build == 'true'
+        continue-on-error: true # mirror is a nice-to-have; never fail a published release over it
+        env:
+          OFFICIAL: ${{ steps.decide.outputs.official_version }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          # checkout@v4 uses a single-branch fetch refspec, so name the dest ref explicitly.
+          git fetch origin upstream:refs/remotes/origin/upstream
+          git worktree add "$RUNNER_TEMP/up" origin/upstream
+          rsync -a --delete --exclude '.git' "$RUNNER_TEMP/official/" "$RUNNER_TEMP/up/"
+          cd "$RUNNER_TEMP/up"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "upstream already current — no commit"
+          else
+            git commit -m "Pristine official source v${OFFICIAL}"
+            git push origin HEAD:upstream
+          fi
+
+      - name: Open an issue if the patch failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.decide.outputs.tag }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="Automated patch failed${TAG:+ for }${TAG}"
+          EXISTING=$(gh issue list --state open --search "in:title $TITLE" --json number --jq 'length' 2>/dev/null || echo 0)
+          if [ "${EXISTING:-0}" = "0" ]; then
+            gh issue create --title "$TITLE" \
+              --body "The autonomous patch/build failed on run ${RUN_URL}. The official extension likely changed in a way the injection-only patch can't handle (e.g. no module-booting HTML anchor, or a manifest shape change). Inspect the logs, update scripts/patch.mjs or patch/payload/, then re-run via workflow_dispatch."
+          else
+            echo "open failure issue already exists — not duplicating"
+          fi

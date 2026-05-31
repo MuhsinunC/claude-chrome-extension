@@ -20,29 +20,30 @@ This is the single durable source of truth for all work.
   - [x] Map login-gate / auth flow from deobfuscated source (storage keys, profile/account endpoints, response shapes, token format)
   - [x] Write design doc at docs/plans/2026-05-31-autonomous-patcher-design.md
   - [x] Review plan with pr-review-toolkit:code-reviewer; iterate to zero Critical/Important (rev2: 0 Critical, Importants resolved)
-- [ ] Repo restructure
-  - [ ] Create archive/reverse-engineering branch preserving all Humanify + old hand-patch work; push
-  - [ ] Repurpose upstream branch as a pristine official-source mirror (auto-synced by CI)
-  - [ ] Slim main to the patcher project (heavy deobfuscated files out of working tree; kept in archive)
-- [ ] Injection-only patcher
-  - [ ] Injected override payload
-    - [ ] Reroute api.anthropic.com model calls -> custom base URL + inject API key header
-    - [ ] Return synthetic /api/oauth/profile 200 response to pass the login gate (only load-bearing fake; no bundle edits)
-    - [ ] Seed a synthetic local token in chrome.storage so the initial auth check passes
-    - [ ] Discard pure-ingest telemetry only (segment / sentry / datadog / honeycomb; NOT statsig/featureassets - config-bearing)
-  - [ ] Options settings UI page (toggle useCustomApi, set customApiBaseUrl, set customApiKey)
-  - [ ] Patch script (operates on an extracted official src dir)
-    - [ ] Strip _metadata/ (CRX signature)
-    - [ ] Edit manifest.json: name "Claude (Patched)", version +".1", remove key (own ID; --keep-key flag), remove update_url, broaden connect-src CSP
-    - [ ] Inject payload <script> into every module-booting HTML (enumerate *.html; v1.0.74 = options/pairing/sidepanel) before first module script
-    - [ ] Copy payload + options files into the output
-  - [ ] Refactor extract-crx.sh: output-dir arg (drop in-place rm -rf src/), remove auto-unminify call, bump Chrome UA (131 -> 140)
-  - [ ] Build/package script -> dist/claude-patched-vX.Y.Z.1.zip
-- [ ] Local verification
-  - [ ] Run refactored extract-crx.sh to fetch the current official version into a scratch dir
-  - [ ] Patch + load unpacked in Chrome; confirm it loads with no console errors
-  - [ ] Stand up a mock Anthropic-Messages endpoint; confirm reroute + key header + login bypass + response render
-  - [ ] Report what is verified vs. what needs a real Anthropic key
+- [x] Repo restructure
+  - [x] Create archive/reverse-engineering branch preserving all Humanify + old hand-patch work; push (origin, 309 files)
+  - [x] Repurpose upstream branch as a pristine official-source mirror v1.0.74 (push, SHA 860814f; CI keeps current)
+  - [x] Slim main to the patcher project (RE artifacts removed; kept in archive + history)
+- [x] Injection-only patcher
+  - [x] Injected override payload (patch/payload/cp-inject.js)
+    - [x] Reroute api.anthropic.com model calls -> custom base URL + inject API key header
+    - [x] Return synthetic /api/oauth/profile 200 response to pass the login gate (only load-bearing fake; no bundle edits)
+    - [x] Seed a synthetic local token in chrome.storage so the initial auth check passes
+    - [x] Discard pure-ingest telemetry only (segment / sentry / datadog / honeycomb; NOT statsig/featureassets - config-bearing)
+  - [x] Options settings UI page (cp-settings.html/js; toggle useCustomApi, set base+key; seeds live on Save)
+  - [x] Patch script scripts/patch.mjs (operates on an extracted official src dir)
+    - [x] Strip _metadata/ (CRX signature)
+    - [x] Edit manifest.json: name "Claude (Patched)", version +".1", remove key (own ID; --keep-key flag), remove update_url, broaden connect-src CSP
+    - [x] Inject payload <script> into every module-booting HTML (enumerate *.html; v1.0.74 = options/pairing/sidepanel) before first module script
+    - [x] Copy payload files into the output
+  - [x] Refactor extract-crx.sh: output-dir arg (drop in-place rm -rf src/), remove auto-unminify call, bump Chrome UA (131 -> 140)
+  - [x] Build/package script scripts/build.mjs -> dist/claude-patched-vX.Y.Z.1.zip
+- [~] Local verification
+  - [x] Run refactored extract-crx.sh -> pristine v1.0.74 into scratch dir
+  - [x] Patch + build structural checks all pass (manifest/CSP/_metadata/inject 3-of-3 HTML/zip 5.25MB)
+  - [x] Override unit test (test/override.test.mjs, Node, 18/18): reroute + header-normalize + profile fake + telemetry drop + no-op-off
+  - [x] Real-Chrome load (test/browser-smoke.mjs + control): patched ext registers identically to pristine official -> patch does not break loading
+  - [ ] Interactive chat round-trip: MANUAL (Chrome 148 blocks programmatic extension-page nav for pristine too; truest test needs a real Anthropic key) - steps in README
 - [ ] CI/CD release pipeline (GitHub Actions)
   - [ ] Version-detect script: read latest Web Store version, compare to latest GitHub Release
   - [ ] Workflow: cron every 6h + manual dispatch

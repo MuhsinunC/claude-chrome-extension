@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="claude">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude (Patched) — API Settings</title>
+    <style>
+      :root { color-scheme: light dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        background: #1f1e1d;
+        color: #f5f4f2;
+        line-height: 1.5;
+      }
+      main { max-width: 560px; margin: 0 auto; padding: 40px 24px; }
+      h1 { font-size: 22px; margin: 0 0 4px; }
+      .sub { margin: 0 0 28px; color: #b8b4ad; font-size: 14px; }
+      .row { display: block; margin-bottom: 22px; }
+      .row > span { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+      .row.toggle { display: flex; align-items: center; gap: 10px; }
+      .row.toggle > span { margin: 0; font-weight: 500; }
+      input[type="text"], input[type="password"] {
+        width: 100%; padding: 10px 12px; font-size: 14px;
+        border: 1px solid #45413b; border-radius: 8px;
+        background: #2a2826; color: #f5f4f2;
+      }
+      input[type="text"]:focus, input[type="password"]:focus { outline: none; border-color: #c96442; }
+      input[type="checkbox"] { width: 18px; height: 18px; accent-color: #c96442; }
+      small { display: block; margin-top: 6px; color: #918c84; font-size: 12px; }
+      button {
+        margin-top: 8px; padding: 11px 22px; font-size: 14px; font-weight: 600;
+        border: none; border-radius: 8px; background: #c96442; color: #fff; cursor: pointer;
+      }
+      button:hover { background: #b5563a; }
+      .status { margin-top: 14px; font-size: 13px; min-height: 18px; }
+      .status.ok { color: #6cc070; }
+      .status.err { color: #e0726a; }
+      .note { margin-top: 32px; padding-top: 18px; border-top: 1px solid #35322e; color: #918c84; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Claude (Patched)</h1>
+      <p class="sub">Use your own Anthropic API key — no Claude account or login required.</p>
+      <form id="cp-form">
+        <label class="row toggle">
+          <input type="checkbox" id="cp-enabled" />
+          <span>Enable API mode (use my key instead of logging in)</span>
+        </label>
+        <label class="row">
+          <span>API base URL</span>
+          <input type="text" id="cp-base" placeholder="https://api.anthropic.com" autocomplete="off" spellcheck="false" />
+          <small>Default <code>https://api.anthropic.com</code>. Must be <code>https://</code> or <code>http://localhost:PORT</code> (a local proxy).</small>
+        </label>
+        <label class="row">
+          <span>API key</span>
+          <input type="password" id="cp-key" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+          <small>Stored only in this browser (<code>chrome.storage.local</code>) and sent only to your API base URL.</small>
+        </label>
+        <button type="submit" id="cp-save">Save settings</button>
+        <p id="cp-status" class="status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="note">
+        Unofficial patched build of Anthropic's "Claude in Chrome". For educational/personal use.
+        When API mode is on, the login screen is bypassed and chat requests go to your endpoint with your key.
+      </p>
+    </main>
+    <script src="/cp-settings.js"></script>
+  </body>
+</html>
