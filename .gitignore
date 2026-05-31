@@ -1,24 +1,4 @@
-# Secrets - API keys, URLs with tokens
 .env
 .env.*
 *.env
-
-# Humanify logs
-humanify*.log
-
-# Temporary/test directories
-deobfuscated-test/
-test-deobfuscated/
-
-# Node
-node_modules/
-
-# OS
 .DS_Store
-Thumbs.db
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
