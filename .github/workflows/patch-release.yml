@@ -62,6 +62,7 @@ jobs:
         run: |
           set -uo pipefail
           npm ci
+          npx --yes puppeteer browsers install chrome   # download Chrome for Testing (npm ci doesn't)
           sudo apt-get update && sudo apt-get install -y xvfb
           ok=0
           for i in 1 2 3; do

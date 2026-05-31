@@ -63,7 +63,7 @@ const server = http.createServer((req, res) => {
 });
 await new Promise((r) => server.listen(PORT, r));
 
-const browser = await puppeteer.launch({ headless: false, userDataDir: profile, args: [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`, '--no-first-run', '--no-default-browser-check'] });
+const browser = await puppeteer.launch({ headless: false, userDataDir: profile, args: [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`, '--no-first-run', '--no-default-browser-check', '--no-sandbox', '--disable-dev-shm-usage'] });
 let pass = 0, fail = 0;
 const ck = (n, c) => { console.log((c ? '  OK  ' : ' FAIL ') + n); c ? pass++ : fail++; };
 try {
