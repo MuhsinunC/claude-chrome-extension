@@ -61,3 +61,5 @@ This is the single durable source of truth for all work.
 - [ ] Backlog / later (optional)
   - [ ] Optional: purge large deobfuscated blob from main history (git filter-repo) to shrink clones
   - [ ] Optional: keep reverse-engineering / learning notes derived from the deobfuscated source
+  - [ ] Optional: wire test/e2e.test.mjs into CI as a pre-release gate (needs Chrome for Testing + xvfb on the runner; validate headless MV3 first so a flaky e2e never blocks a release)
+  - [ ] Optional: bump GitHub Actions off Node 20 (checkout/setup-node) before the mid-2026 deprecation
