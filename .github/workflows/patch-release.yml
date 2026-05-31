@@ -54,8 +54,26 @@ jobs:
         if: steps.decide.outputs.should_build == 'true'
         run: node scripts/build.mjs "$RUNNER_TEMP/official" "$RUNNER_TEMP/dist"
 
+      # Gate: verify the freshly-patched build in a real browser (Chrome for Testing
+      # under xvfb) BEFORE publishing. Retries absorb transient browser flakiness so a
+      # good release is never blocked spuriously; a real breakage fails all attempts.
+      - name: E2E gate (Chrome for Testing under xvfb)
+        if: ${{ steps.decide.outputs.should_build == 'true' && success() }}
+        run: |
+          set -uo pipefail
+          npm ci
+          sudo apt-get update && sudo apt-get install -y xvfb
+          ok=0
+          for i in 1 2 3; do
+            rm -rf .chrome-test-profile
+            echo "::group::e2e attempt $i"
+            if xvfb-run -a node test/e2e.test.mjs "$RUNNER_TEMP/official"; then ok=1; echo "::endgroup::"; break; fi
+            echo "::endgroup::"; echo "e2e attempt $i failed; retrying"; sleep 5
+          done
+          [ "$ok" = 1 ] || { echo "e2e gate failed after 3 attempts — refusing to publish"; exit 1; }
+
       - name: Create GitHub Release
-        if: steps.decide.outputs.should_build == 'true'
+        if: ${{ steps.decide.outputs.should_build == 'true' && success() }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.decide.outputs.tag }}
@@ -75,12 +93,14 @@ jobs:
             "" \
             "Unofficial; for educational/personal use. Source extension © Anthropic. See the repository README and disclaimer." \
             > "$RUNNER_TEMP/notes.md"
-          gh release create "$TAG" "$ZIP" \
-            --title "Claude (Patched) ${TAG}" \
-            --notes-file "$RUNNER_TEMP/notes.md"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP" --clobber
+          else
+            gh release create "$TAG" "$ZIP" --title "Claude (Patched) ${TAG}" --notes-file "$RUNNER_TEMP/notes.md"
+          fi
 
       - name: Sync pristine source to upstream branch
-        if: steps.decide.outputs.should_build == 'true'
+        if: ${{ steps.decide.outputs.should_build == 'true' && success() }}
         continue-on-error: true # mirror is a nice-to-have; never fail a published release over it
         env:
           OFFICIAL: ${{ steps.decide.outputs.official_version }}

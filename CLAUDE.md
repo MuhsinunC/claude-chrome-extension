@@ -34,6 +34,7 @@ node test/e2e.test.mjs                     # full round-trip in Chrome for Testi
 
 - Patched `version` = official `+ ".1"`; `name` = `Claude (Patched)`; `key` removed (own ID, coexists with official).
 - **Git account: `MuhsinunC` (personal).** macOS osxkeychain misroutes `git push` to the work account → 404. Push with the helper cleared: `git -c credential.helper= -c credential.helper='!gh auth git-credential' push …`. Confirm `gh api user --jq .login` is `MuhsinunC` first.
-- Testing the loaded extension is constrained: recent Chrome blocks `--load-extension` automation, and a real chat round-trip needs a real Anthropic key — so that final check is manual.
+- Testing: `node test/e2e.test.mjs` runs the full network round-trip in Chrome for Testing (stable Chrome blocks `--load-extension`; CfT permits it). The literal side-panel WIDGET click isn't drivable on CfT 148 (no CDP `Extensions` domain → no `triggerExtensionAction`); it uses the same fetch the e2e drives, so the patch is covered — revisit when CfT ships that domain. A real-key round-trip against `api.anthropic.com` is the only inherently-manual check.
+- **Keep the official manifest `key`** (default): the extension ID must stay `fcoeoabgfenejglbffodgkkbkcdhcgfn` or Claude Code's browser automation (native messaging allow-list) can't connect. `--remove-key` opts into a distinct ID (coexists with the official build, but breaks Claude Code). Claude Code's browser feature also needs a Claude subscription (separate from the extension's API-key chat).
 - Full design + reverse-engineering evidence (storage keys, endpoints, the login gate): `docs/plans/2026-05-31-autonomous-patcher-design.md`.
 - Never commit secrets (`.env` is gitignored) or vendor official source onto `main`.

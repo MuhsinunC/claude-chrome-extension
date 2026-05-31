@@ -13,7 +13,7 @@ A GitHub Actions pipeline checks the Chrome Web Store every 6 hours; when Anthro
 3. Click **Load unpacked** and select the unzipped folder.
 4. Turn on API mode (next section).
 
-The patched build has its **own extension ID**, so it can coexist with the official extension.
+The patched build keeps the **official extension ID**, so install it *instead of* the official "Claude in Chrome" (uninstall that one first — Chrome won't run two extensions with the same ID). Keeping the official ID is deliberate: it's what lets **Claude Code's browser automation** keep working with the patched build. (Claude Code's browser feature itself needs a Claude subscription — that's separate from the extension's API-key chat, which needs no account.)
 
 ## Enable API mode
 
@@ -37,7 +37,7 @@ Toggle it off any time to restore the normal account/login behavior.
 
 The official bundles are minified and **re-hashed every release**, so editing them can't be automated reliably. Instead the patch is **injection-only** — it never touches Anthropic's app code. It only:
 
-- edits `manifest.json` (name, `version`+`.1`, removes `key`/`update_url`, broadens `connect-src`);
+- edits `manifest.json` (name, `version`+`.1`, removes `update_url`, **keeps the official `key`** so the ID stays Claude-Code-compatible, broadens `connect-src`);
 - strips `_metadata/` (the CRX signature);
 - injects one `<script src="/cp-inject.js">` before the first module script in **every** app HTML entry (enumerated, not hardcoded — entry files change between versions);
 - adds its own files: `cp-inject.js` (a `fetch` override) and a `cp-settings` page.
@@ -90,10 +90,10 @@ extract official → decide (skip if `vX.Y.Z.1` already released) → patch → 
 Automated and passing:
 - **Patcher** (`scripts/patch.mjs`): manifest / CSP / `_metadata` / HTML-injection correctness; idempotent.
 - **Override unit test** — `node test/override.test.mjs` (21/21): reroute, key injection, `Authorization`→`x-api-key`, profile fake, telemetry drop, full no-op when off.
-- **End-to-end** — `node test/e2e.test.mjs` (13/13): loads the patched build in **Chrome for Testing**, confirms the **login gate is bypassed**, and exercises the **real network path the chat uses** — `/v1/*` rerouted to your endpoint with your `x-api-key` (OAuth `Authorization` stripped), `/api/oauth/profile` faked locally, the streamed SSE reply received intact, telemetry dropped, and the extension's tab view cross-checked against the browser. (Run `npm install` first — it fetches Chrome for Testing.)
-- **CI**: a live run published and validated a real release; re-runs are idempotent.
+- **End-to-end** — `node test/e2e.test.mjs` (15/15): loads the patched build in **Chrome for Testing**, asserts it keeps the **official extension ID** (Claude Code compatibility), confirms the **login gate is bypassed**, and exercises the **real network path the chat uses** — `/v1/*` rerouted to your endpoint with your `x-api-key` (OAuth `Authorization` stripped), `/api/oauth/profile` faked locally, the streamed SSE reply received intact, telemetry dropped, and the extension's tab view cross-checked against the browser. (Run `npm install` first — it fetches Chrome for Testing.)
+- **CI gate**: the release pipeline runs this e2e (Chrome for Testing under `xvfb`) **before publishing** each new version, so nothing is released unless it passed in a real browser; re-runs are idempotent.
 
-The only thing not automated is the literal **UI click** in the live side panel: `chrome.sidePanel.open` requires a user gesture, and the agent app loops when forced into a standalone tab — both Chrome/product limits, not patch defects. Because the e2e drives the *same* `fetch` override the chat uses, the chat works when you open the side panel normally; with a real Anthropic key it's a real round-trip.
+Two checks stay manual, both by external limitation (not patch defects): (1) the literal **side-panel widget click** — Puppeteer's `triggerExtensionAction` needs a CDP `Extensions` domain that Chrome for Testing 148 doesn't implement yet, and the widget calls the same `fetch` the e2e already drives; (2) **Claude Code driving the patched extension** (navigate + click) — that uses native messaging + a Claude subscription and can't run headless, so it's a documented manual check, guarded automatically by the official-ID assertion above. With a real Anthropic key, the side-panel chat is a real round-trip.
 
 ## Disclaimer & license
 

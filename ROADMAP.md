@@ -58,6 +58,13 @@ This is the single durable source of truth for all work.
   - [x] Final code-review gate: implementation reviewed to zero Critical/Important (C1/I1/I2 fixed + verified)
   - [x] Commit + push under MuhsinunC on correct branches
   - [x] Final verification + summary
+- [~] Full autonomy hardening (self-maintaining; Claude Code never needed to RUN it)
+  - [x] Research Claude Code <-> extension: native messaging; requires the OFFICIAL extension id (allow-list); needs a Claude subscription (not API-key auth)
+  - [x] Decide key/ID: KEEP the official key by default (official id) so Claude Code can connect; --remove-key opts into a distinct id (coexistence, breaks CC). Asserted in e2e.
+  - [x] Side-panel chat WIDGET e2e: deferred - CfT 148 lacks the CDP Extensions domain (triggerExtensionAction); the network path it uses is e2e-verified (15/15). Revisit on newer CfT.
+  - [x] "Claude Code drives the extension" e2e: can't CI-automate (native-messaging host + real CLI process + interactive subscription auth); guarded by the auto official-id assertion + a documented manual check.
+  - [~] Wire e2e into CI as a release gate (xvfb + Chrome for Testing; gate only on new versions; retries so flakiness never blocks a good release)
+  - [ ] Document that the running pipeline uses zero Claude Code / zero Claude usage (pure GitHub Actions)
 - [ ] Backlog / later (optional)
   - [ ] Optional: purge large deobfuscated blob from main history (git filter-repo) to shrink clones
   - [ ] Optional: keep reverse-engineering / learning notes derived from the deobfuscated source

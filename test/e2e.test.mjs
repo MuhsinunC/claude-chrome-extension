@@ -5,16 +5,20 @@
 // the reroute + key-injection + profile-fake + telemetry-drop against a mock
 // Anthropic endpoint. Also cross-references the extension's tab view.
 //
-// (The side-panel chat *UI* can't be auto-driven: chrome.sidePanel.open needs a
-// user gesture, and the app loops [React #185] when forced into a standalone
-// tab. Those are product/browser limits, not patch defects — see README.)
+// (The literal side-panel chat WIDGET can't be auto-driven on Chrome for Testing
+// 148: Puppeteer's triggerExtensionAction needs the CDP "Extensions" domain, which
+// CfT 148 reports "Method not available"; chrome.sidePanel.open also needs a user
+// gesture, and the app loops [React #185] in a standalone tab. All browser-tooling
+// limits, not patch defects. The widget calls the same fetch this test drives, so
+// the patch is fully covered; revisit the widget test when CfT ships that domain.)
 //
 // Usage: node test/e2e.test.mjs <patched-ext-dir>
 import puppeteer from 'puppeteer';
 import http from 'node:http';
 import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+
+const OFFICIAL_ID = 'fcoeoabgfenejglbffodgkkbkcdhcgfn';
 
 const PORT = 8787;
 const KEY = 'sk-ant-test-key';
@@ -32,7 +36,6 @@ if (!ext) {
     execFileSync('node', ['scripts/patch.mjs', ext], { stdio: 'inherit' });
   }
 }
-const ID = [...createHash('sha256').update(ext).digest('hex').slice(0, 32)].map((c) => String.fromCharCode(97 + parseInt(c, 16))).join('');
 
 const received = [];
 const server = http.createServer((req, res) => {
@@ -64,6 +67,18 @@ const browser = await puppeteer.launch({ headless: false, userDataDir: profile, 
 let pass = 0, fail = 0;
 const ck = (n, c) => { console.log((c ? '  OK  ' : ' FAIL ') + n); c ? pass++ : fail++; };
 try {
+  // Discover the loaded extension's real ID via chrome://extensions (robust whether
+  // the key is kept [official id] or removed). Then assert it's the official id, which
+  // is what Claude Code's native-messaging allow-list requires.
+  const cfg = await browser.newPage();
+  await cfg.goto('chrome://extensions/', { waitUntil: 'domcontentloaded', timeout: 15000 });
+  await sleep(800);
+  const ID = await cfg.evaluate(() => new Promise((res) => chrome.developerPrivate.getExtensionsInfo({}, (i) => res(((i || []).find((e) => e.name === 'Claude (Patched)') || {}).id || null))));
+  await cfg.close().catch(() => {});
+  ck('patched extension loaded (visible in chrome://extensions)', !!ID);
+  ck('keeps the official extension id (Claude Code native-messaging compatible)', ID === OFFICIAL_ID);
+  if (!ID) throw new Error('patched extension not loaded');
+
   const isSW = (t) => t.type() === 'service_worker' && t.url().startsWith(`chrome-extension://${ID}`);
   const p0 = await browser.newPage();
   await p0.goto('https://example.com', { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});

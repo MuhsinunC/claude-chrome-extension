@@ -35,7 +35,12 @@ function fail(msg) {
 }
 
 const args = process.argv.slice(2);
-const keepKey = args.includes('--keep-key');
+// Keep the official `key` by DEFAULT so the extension ID stays fcoeoab… — required
+// for Claude Code's browser automation (native messaging only allows the official
+// ID). `--remove-key` opts into a distinct ID (coexists with the official build but
+// BREAKS Claude Code's connection).
+const removeKey = args.includes('--remove-key');
+const OFFICIAL_ID = 'fcoeoabgfenejglbffodgkkbkcdhcgfn';
 const target = args.find((a) => !a.startsWith('--'));
 if (!target) fail('usage: node scripts/patch.mjs <extension-dir> [--keep-key]');
 
@@ -59,7 +64,13 @@ if (!alreadyPatched) {
   manifest.description = 'Claude in Chrome — patched for custom API endpoint + API-key mode (unofficial).';
 }
 delete manifest.update_url;
-if (!keepKey) delete manifest.key;
+if (removeKey) {
+  delete manifest.key;
+} else if (!manifest.key) {
+  // The official build ships a `key`; if a future version drops it, fail loudly
+  // rather than silently shipping a Claude-Code-incompatible build.
+  fail('official manifest has no `key` to preserve — needed for the official ID (Claude Code native messaging)');
+}
 
 const cspBlock = manifest.content_security_policy;
 if (cspBlock && cspBlock.extension_pages) {
@@ -111,5 +122,5 @@ if (existsSync(metaDir)) fail('_metadata/ still present after strip');
 
 console.log(
   `patched ${officialVersion} -> ${manifest.version} | HTML injected ${injected}/${moduleBooting} | ` +
-  `key ${keepKey ? 'kept' : 'removed'} | _metadata stripped | payload x${PAYLOAD_FILES.length}`
+  `key ${removeKey ? 'removed (new id)' : 'kept (official id)'} | _metadata stripped | payload x${PAYLOAD_FILES.length}`
 );
