@@ -44,19 +44,20 @@ This is the single durable source of truth for all work.
   - [x] Override unit test (test/override.test.mjs, Node, 18/18): reroute + header-normalize + profile fake + telemetry drop + no-op-off
   - [x] Real-Chrome load (test/browser-smoke.mjs + control): patched ext registers identically to pristine official -> patch does not break loading
   - [ ] Interactive chat round-trip: MANUAL (Chrome 148 blocks programmatic extension-page nav for pristine too; truest test needs a real Anthropic key) - steps in README
-- [ ] CI/CD release pipeline (GitHub Actions)
-  - [ ] Version-detect script: read latest Web Store version, compare to latest GitHub Release
-  - [ ] Workflow: cron every 6h + manual dispatch
-    - [ ] On new version: patch -> zip -> create Release tagged vX.Y.Z.1 with install notes
-    - [ ] Commit fresh official src to upstream branch
-    - [ ] On patch failure: open a GitHub issue and skip (never ship broken)
-  - [ ] Live-test via workflow_dispatch; confirm a Release is produced
-- [ ] Docs & finalize
-  - [ ] Rewrite README for new scope (autonomous patcher, releases, install, disclaimer)
-  - [ ] Create project-level CLAUDE.md (project context + pointer to ROADMAP.md) + improver pass
-  - [ ] Final code-review gate to zero Critical/Important
-  - [ ] Commit + push under MuhsinunC on correct branches
-  - [ ] Final verification + summary
+- [x] CI/CD release pipeline (GitHub Actions)
+  - [x] Version-detect (check-release.mjs): read version from extracted manifest, compare to existing GH Release
+  - [x] Workflow: cron every 6h + manual dispatch
+    - [x] On new version: patch -> zip -> create Release tagged vX.Y.Z.1 with install notes
+    - [x] Commit fresh official src to upstream branch (git worktree; continue-on-error)
+    - [x] On patch failure: open a GitHub issue (deduped) and never ship broken
+  - [x] Live-test via workflow_dispatch: Release "Claude (Patched) v1.0.74.1" published + artifact validated
+  - [x] Idempotency verified: 2nd run no-ops (patch/build/release skipped; no duplicate release)
+- [x] Docs & finalize
+  - [x] Rewrite README for new scope (autonomous patcher, releases, install, disclaimer)
+  - [x] Create project-level CLAUDE.md (project context + pointer to ROADMAP.md) + improver pass
+  - [x] Final code-review gate: implementation reviewed to zero Critical/Important (C1/I1/I2 fixed + verified)
+  - [x] Commit + push under MuhsinunC on correct branches
+  - [x] Final verification + summary
 - [ ] Backlog / later (optional)
   - [ ] Optional: purge large deobfuscated blob from main history (git filter-repo) to shrink clones
   - [ ] Optional: keep reverse-engineering / learning notes derived from the deobfuscated source
