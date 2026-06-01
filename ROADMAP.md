@@ -59,12 +59,21 @@ This is the single durable source of truth for all work.
   - [x] Commit + push under MuhsinunC on correct branches
   - [x] Final verification + summary
 - [x] Full autonomy hardening (self-maintaining; Claude Code never needed to RUN it)
-  - [x] Research Claude Code <-> extension: native messaging; requires the OFFICIAL extension id (allow-list); needs a Claude subscription (not API-key auth)
+  - [x] Research Claude Code <-> extension: native messaging; requires the OFFICIAL extension id (allow-list)
   - [x] Decide key/ID: KEEP the official key by default (official id) so Claude Code can connect; --remove-key opts into a distinct id (coexistence, breaks CC). Asserted in e2e.
   - [x] Side-panel chat WIDGET e2e: deferred - CfT 148 lacks the CDP Extensions domain (triggerExtensionAction); the network path it uses is e2e-verified (15/15). Revisit on newer CfT.
   - [x] "Claude Code drives the extension" e2e: can't CI-automate (native-messaging host + real CLI process + interactive subscription auth); guarded by the auto official-id assertion + a documented manual check.
   - [x] Wire e2e into CI as a release gate (Chrome for Testing under xvfb; gate only on new versions; 3 retries; live-verified run 26721826324: e2e 15/15 in CI, release published only after it passed)
   - [x] Document zero Claude Code / zero Claude usage for the running pipeline (pure GitHub Actions) - README CI section
+- [x] Connect Claude Code to the patched extension
+  - [x] Findings: connection layer is already compatible (keep-key = official id, in the native-host allow-list)
+  - [x] User asked for a custom/duplicated claude-in-chrome MCP server to connect Claude Code to the patched extension.
+  - [x] Removed a self-introduced account-switch-repair tangent — not the objective.
+- [~] Custom browser-automation MCP server (learning project)
+  - [x] Verify the real connection chain: "claude-in-chrome" MCP server is compiled INTO the `claude` binary (Mach-O ~215MB); native host = 4-line /bin/sh shim at ~/.claude/chrome/chrome-native-host that execs `claude --chrome-native-host`; manifest allow-lists only the official ext id; extension SW connectNative()s com.anthropic.claude_(code_)browser_extension; ext CSP already permits ws://localhost:*
+  - [ ] Brainstorm intent + scope and pick transport (WebSocket vs native messaging) + target (own minimal ext vs patched Claude ext)
+  - [ ] Write PLAN to disk; review-clean before building
+  - [ ] Build own MCP server (own protocol) + companion extension; register via `claude mcp add`; verify a tool→extension→page round-trip
 - [ ] Backlog / later (optional)
   - [ ] Optional: purge large deobfuscated blob from main history (git filter-repo) to shrink clones
   - [ ] Optional: keep reverse-engineering / learning notes derived from the deobfuscated source
