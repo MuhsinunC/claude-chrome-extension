@@ -6,6 +6,9 @@
 # Dependencies
 node_modules/
 
+# Generated, machine-specific native-host wrapper (written by connector/install.mjs)
+connector/chrome-native-host
+
 # Build outputs
 dist/
 build/

@@ -1,0 +1,18 @@
+{
+  "name": "claude-in-chrome-custom-connector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Subscription-free MCP connector bridging Claude Code to the patched Claude-in-Chrome extension (Approach A: reuse the extension's own executors over Chrome native messaging).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "start:mcp": "node bridge.mjs --mcp",
+    "start:native-host": "node bridge.mjs --native-host"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}
