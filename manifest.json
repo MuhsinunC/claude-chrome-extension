@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude (Patched)",
-  "version": "1.0.74.1",
+  "version": "1.0.75.1",
   "description": "Claude in Chrome — patched for custom API endpoint + API-key mode (unofficial).",
   "minimum_chrome_version": "116",
   "icons": {
