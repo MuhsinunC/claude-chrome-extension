@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude (Patched)",
-  "version": "1.0.80.1",
+  "version": "1.0.81.1",
   "description": "Claude in Chrome — patched for custom API endpoint + API-key mode (unofficial).",
   "minimum_chrome_version": "116",
   "icons": {
@@ -42,7 +42,7 @@
   "content_scripts": [
     {
       "js": [
-        "assets/content-script.ts-loader-DKJzsl7H.js"
+        "assets/content-script.ts-loader-Dd0kPPVP.js"
       ],
       "matches": [
         "https://claude.ai/*",
@@ -52,7 +52,7 @@
     },
     {
       "js": [
-        "assets/accessibility-tree.js-DFF5rNzt.js"
+        "assets/accessibility-tree.js-B-oUarrX.js"
       ],
       "matches": [
         "<all_urls>"
@@ -62,7 +62,7 @@
     },
     {
       "js": [
-        "assets/agent-visual-indicator.js-CW8zgsee.js"
+        "assets/agent-visual-indicator.js-D0xakyZv.js"
       ],
       "matches": [
         "<all_urls>"
@@ -97,8 +97,8 @@
         "https://claude.ai/*"
       ],
       "resources": [
-        "assets/onboarding-prompts-CWLEgoC0.js",
-        "assets/content-script.ts-zjy42LA0.js"
+        "assets/onboarding-prompts-CJtFEMjA.js",
+        "assets/content-script.ts-D0rMrCjG.js"
       ],
       "use_dynamic_url": false
     },
@@ -107,8 +107,8 @@
         "<all_urls>"
       ],
       "resources": [
-        "assets/accessibility-tree.js-DFF5rNzt.js",
-        "assets/agent-visual-indicator.js-CW8zgsee.js"
+        "assets/accessibility-tree.js-B-oUarrX.js",
+        "assets/agent-visual-indicator.js-D0xakyZv.js"
       ],
       "use_dynamic_url": false
     }
