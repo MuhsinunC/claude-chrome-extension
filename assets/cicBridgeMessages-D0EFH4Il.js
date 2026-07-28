@@ -1,1 +1,0 @@
-var I="CIC_IFRAME_BRIDGE_INIT",_="CIC_IFRAME_TOOL_CALL",C=[I,_];export{I as n,_ as r,C as t};

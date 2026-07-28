@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude (Patched)",
-  "version": "1.0.81.1",
+  "version": "1.0.84.1",
   "description": "Claude in Chrome — patched for custom API endpoint + API-key mode (unofficial).",
   "minimum_chrome_version": "116",
   "icons": {
@@ -62,7 +62,7 @@
     },
     {
       "js": [
-        "assets/agent-visual-indicator.js-D0xakyZv.js"
+        "assets/agent-visual-indicator.js-CwioqiOd.js"
       ],
       "matches": [
         "<all_urls>"
@@ -108,7 +108,7 @@
       ],
       "resources": [
         "assets/accessibility-tree.js-B-oUarrX.js",
-        "assets/agent-visual-indicator.js-D0xakyZv.js"
+        "assets/agent-visual-indicator.js-CwioqiOd.js"
       ],
       "use_dynamic_url": false
     }
