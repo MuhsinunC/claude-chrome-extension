@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude (Patched)",
-  "version": "1.0.100.1",
+  "version": "1.0.101.1",
   "description": "Claude in Chrome — patched for custom API endpoint + API-key mode (unofficial).",
   "minimum_chrome_version": "116",
   "icons": {
@@ -42,7 +42,7 @@
   "content_scripts": [
     {
       "js": [
-        "assets/content-script.ts-loader-Dd0kPPVP.js"
+        "assets/content-script.ts-loader-D2HlXAAI.js"
       ],
       "matches": [
         "https://claude.ai/*",
@@ -98,7 +98,7 @@
       ],
       "resources": [
         "assets/onboarding-prompts-CJtFEMjA.js",
-        "assets/content-script.ts-D0rMrCjG.js"
+        "assets/content-script.ts-C6lrM1Zv.js"
       ],
       "use_dynamic_url": false
     },
